@@ -188,9 +188,12 @@ src/
   Blog/                     articles, même découpage
   Contact/                  messages de contact, ressource + processor
   Catalog/                  catégories et produits
-    Domain/ProductSearch.php    filtre, facettes disjonctives, tri, pagination (PHP pur)
+    Domain/                 Price, CategoryTree (value objects), ProductSearch : filtre,
+                            facettes disjonctives, tri, pagination (PHP pur)
+    Application/            SearchProducts : charge par les ports, délègue à ProductSearch
   Shared/Infrastructure/ApiPlatform/Scenario/   en-tête X-Scenario
 tests/
+  Unit/                     value objects et cas d'utilisation du catalogue, sans framework
   Functional/               un fichier par ressource, plus X-Scenario et CORS
   Integration/              enregistrement de X-Scenario selon l'environnement
 ```

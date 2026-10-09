@@ -8,13 +8,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
-use App\Catalog\Domain\CategoryRepository;
-use App\Catalog\Domain\CategoryTree;
+use App\Catalog\Application\SearchProducts;
 use App\Catalog\Domain\Exposure;
 use App\Catalog\Domain\Price;
 use App\Catalog\Domain\ProductCriteria;
-use App\Catalog\Domain\ProductRepository;
-use App\Catalog\Domain\ProductSearch;
 use App\Catalog\Domain\ProductSort;
 use App\Catalog\Domain\Size;
 use App\Catalog\Infrastructure\ApiPlatform\Resource\CategoryFacetValue;
@@ -32,17 +29,14 @@ final readonly class ProductListProvider implements ProviderInterface
     /** Borne qui garde le calcul de l'offset dans les entiers : au-delà, la page est simplement vide. */
     public const int MAX_PAGE = 1_000_000;
 
-    public function __construct(
-        private ProductRepository $productRepository,
-        private CategoryRepository $categoryRepository,
-        private ProductSearch $productSearch,
-    ) {
+    public function __construct(private SearchProducts $searchProducts)
+    {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ProductListResource
     {
         $criteria = $this->criteria($operation);
-        $result = $this->productSearch->search($this->productRepository->findAll(), new CategoryTree($this->categoryRepository->findAll()), $criteria);
+        $result = ($this->searchProducts)($criteria);
 
         return new ProductListResource(
             array_map(ProductItem::fromModel(...), $result->items),
