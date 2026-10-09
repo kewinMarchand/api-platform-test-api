@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    services:
+      database:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -d app -U app"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://app:app@127.0.0.1:5432/app?serverVersion=17&charset=utf8
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: apcu, intl, pdo_pgsql, zip
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-progress --prefer-dist
+      - run: make db-reset EXEC=
+      - run: make qa EXEC=

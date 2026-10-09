@@ -1,0 +1,1491 @@
+{
+    "openapi": "3.2.0",
+    "info": {
+        "title": "API de test Kewin",
+        "description": "API de test commune aux boilerplates front (Next, Nuxt, SvelteKit, Symfony Twig, HTML).\nFormats : JSON simple (`application/json`, format par d\u00e9faut) et JSON-LD (`application/ld+json`).\nEn dev et en test, l'en-t\u00eate `X-Scenario: error` renvoie une 500 et `X-Scenario: empty` une collection vide (sur `/api/products` : liste sans produit, totaux et compteurs \u00e0 0).",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": ""
+        }
+    ],
+    "paths": {
+        "/api/articles": {
+            "get": {
+                "operationId": "api_articles_get_collection",
+                "tags": [
+                    "Article"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article collection",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Article"
+                                    }
+                                }
+                            },
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "Article.jsonld collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Article.jsonld"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Retrieves the collection of Article resources.",
+                "description": "Retrieves the collection of Article resources.",
+                "parameters": []
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "operationId": "api_categories_get_collection",
+                "tags": [
+                    "Category"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category collection",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            },
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "Category.jsonld collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Category.jsonld"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Retrieves the collection of Category resources.",
+                "description": "Retrieves the collection of Category resources.",
+                "parameters": []
+            }
+        },
+        "/api/contact_messages": {
+            "post": {
+                "operationId": "api_contact_messages_post",
+                "tags": [
+                    "ContactMessage"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "ContactMessage resource created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactMessage"
+                                }
+                            },
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactMessage.jsonld"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Creates a ContactMessage resource.",
+                "description": "Creates a ContactMessage resource.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new ContactMessage resource",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContactMessage"
+                            }
+                        },
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContactMessage"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/products": {
+            "get": {
+                "operationId": "api_products_get",
+                "tags": [
+                    "ProductList"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ProductList resource",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductList"
+                                }
+                            },
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductList.jsonld"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Retrieves a ProductList resource.",
+                "description": "Retrieves a ProductList resource.",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Slug de cat\u00e9gorie : inclut toute la branche. Slug inconnu : 404.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "exposure[]",
+                        "in": "query",
+                        "description": "Expositions accept\u00e9es, cl\u00e9 r\u00e9p\u00e9t\u00e9e : exposure[]=soleil&exposure[]=ombre.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "soleil",
+                                    "mi-ombre",
+                                    "ombre"
+                                ]
+                            }
+                        },
+                        "style": "deepObject",
+                        "explode": true
+                    },
+                    {
+                        "name": "size[]",
+                        "in": "query",
+                        "description": "Tailles accept\u00e9es, cl\u00e9 r\u00e9p\u00e9t\u00e9e : size[]=S&size[]=M.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "S",
+                                    "M",
+                                    "L"
+                                ]
+                            }
+                        },
+                        "style": "deepObject",
+                        "explode": true
+                    },
+                    {
+                        "name": "priceMin",
+                        "in": "query",
+                        "description": "Prix minimum inclus, en centimes.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "priceMax",
+                        "in": "query",
+                        "description": "Prix maximum inclus, en centimes.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "inStock",
+                        "in": "query",
+                        "description": "true : uniquement les produits en stock.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "order[price]",
+                        "in": "query",
+                        "description": "Tri par prix, asc ou desc. Prioritaire sur order[name]. Sans tri : ordre de pertinence.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "order[name]",
+                        "in": "query",
+                        "description": "Tri alphab\u00e9tique (collation fran\u00e7aise), asc ou desc.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Num\u00e9ro de page, \u00e0 partir de 1. Au-del\u00e0 de la derni\u00e8re page : items vide.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "Produits par page, de 1 \u00e0 48.",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 12
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ]
+            }
+        },
+        "/api/tasks": {
+            "get": {
+                "operationId": "api_tasks_get_collection",
+                "tags": [
+                    "Task"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task collection",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Task"
+                                    }
+                                }
+                            },
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "Task.jsonld collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Task.jsonld"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Retrieves the collection of Task resources.",
+                "description": "Retrieves the collection of Task resources.",
+                "parameters": []
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Article": {
+                "type": "object",
+                "description": "Liste les articles, du plus r\u00e9cent au plus ancien, sans pagination.",
+                "required": [
+                    "id",
+                    "slug",
+                    "title",
+                    "excerpt",
+                    "publishedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "excerpt": {
+                        "type": "string"
+                    },
+                    "publishedAt": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                }
+            },
+            "Article.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "slug",
+                            "title",
+                            "excerpt",
+                            "publishedAt"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "slug": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            },
+                            "excerpt": {
+                                "type": "string"
+                            },
+                            "publishedAt": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        }
+                    }
+                ],
+                "description": "Liste les articles, du plus r\u00e9cent au plus ancien, sans pagination."
+            },
+            "Category": {
+                "type": "object",
+                "description": "Renvoie l'arbre des cat\u00e9gories : les cat\u00e9gories racines, chacune avec ses enfants, tri\u00e9es par position.",
+                "required": [
+                    "slug",
+                    "name",
+                    "parent",
+                    "children"
+                ],
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "parent": {
+                        "description": "Slug de la cat\u00e9gorie parente, null \u00e0 la racine.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "children": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Category"
+                        }
+                    }
+                }
+            },
+            "Category.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "slug",
+                            "name",
+                            "parent",
+                            "children"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "parent": {
+                                "description": "Slug de la cat\u00e9gorie parente, null \u00e0 la racine.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "description": "Renvoie l'arbre des cat\u00e9gories : les cat\u00e9gories racines, chacune avec ses enfants, tri\u00e9es par position.",
+                "properties": {
+                    "children": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Category.jsonld"
+                        }
+                    }
+                }
+            },
+            "CategoryFacetValue": {
+                "type": "object",
+                "required": [
+                    "slug",
+                    "name",
+                    "count"
+                ],
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "description": "Nombre de produits de cette sous-cat\u00e9gorie qui respectent les autres filtres.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "CategoryFacetValue.jsonld": {
+                "type": "object",
+                "required": [
+                    "slug",
+                    "name",
+                    "count"
+                ],
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "description": "Nombre de produits de cette sous-cat\u00e9gorie qui respectent les autres filtres.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "ConstraintViolation": {
+                "type": "object",
+                "description": "Unprocessable entity",
+                "properties": {
+                    "status": {
+                        "default": 422,
+                        "type": "integer"
+                    },
+                    "violations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "propertyPath": {
+                                    "type": "string",
+                                    "description": "The property path of the violation"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "The message associated with the violation"
+                                },
+                                "code": {
+                                    "type": "string",
+                                    "description": "The code of the violation"
+                                },
+                                "hint": {
+                                    "type": "string",
+                                    "description": "An extra hint to understand the violation"
+                                },
+                                "payload": {
+                                    "type": "object",
+                                    "additionalProperties": true,
+                                    "description": "The serialized payload of the violation"
+                                }
+                            },
+                            "required": [
+                                "propertyPath",
+                                "message"
+                            ]
+                        }
+                    },
+                    "detail": {
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "type": {
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "title": {
+                        "readOnly": true,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "instance": {
+                        "readOnly": true,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "ConstraintViolation.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "default": 422,
+                                "type": "integer"
+                            },
+                            "violations": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "propertyPath": {
+                                            "type": "string",
+                                            "description": "The property path of the violation"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "description": "The message associated with the violation"
+                                        },
+                                        "code": {
+                                            "type": "string",
+                                            "description": "The code of the violation"
+                                        },
+                                        "hint": {
+                                            "type": "string",
+                                            "description": "An extra hint to understand the violation"
+                                        },
+                                        "payload": {
+                                            "type": "object",
+                                            "additionalProperties": true,
+                                            "description": "The serialized payload of the violation"
+                                        }
+                                    },
+                                    "required": [
+                                        "propertyPath",
+                                        "message"
+                                    ]
+                                }
+                            },
+                            "detail": {
+                                "readOnly": true,
+                                "type": "string"
+                            },
+                            "description": {
+                                "readOnly": true,
+                                "type": "string"
+                            },
+                            "type": {
+                                "readOnly": true,
+                                "type": "string"
+                            },
+                            "title": {
+                                "readOnly": true,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "instance": {
+                                "readOnly": true,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "description": "Unprocessable entity"
+            },
+            "ContactMessage": {
+                "type": "object",
+                "description": "Enregistre un message de contact. R\u00e9pond 422 avec la liste des violations si un champ est invalide.",
+                "properties": {
+                    "id": {
+                        "readOnly": true,
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "name": {
+                        "minLength": 2,
+                        "maxLength": 255,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "email": {
+                        "format": "email",
+                        "maxLength": 255,
+                        "externalDocs": {
+                            "url": "https://schema.org/email"
+                        },
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "message": {
+                        "minLength": 10,
+                        "maxLength": 5000,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "receivedAt": {
+                        "readOnly": true,
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "name",
+                    "email",
+                    "message"
+                ]
+            },
+            "ContactMessage.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "readOnly": true,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "name": {
+                                "minLength": 2,
+                                "maxLength": 255,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "email": {
+                                "format": "email",
+                                "maxLength": 255,
+                                "externalDocs": {
+                                    "url": "https://schema.org/email"
+                                },
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "message": {
+                                "minLength": 10,
+                                "maxLength": 5000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "receivedAt": {
+                                "readOnly": true,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "email",
+                            "message"
+                        ]
+                    }
+                ],
+                "description": "Enregistre un message de contact. R\u00e9pond 422 avec la liste des violations si un champ est invalide."
+            },
+            "Error": {
+                "type": "object",
+                "description": "A representation of common errors.",
+                "properties": {
+                    "title": {
+                        "readOnly": true,
+                        "description": "A short, human-readable summary of the problem.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "detail": {
+                        "readOnly": true,
+                        "description": "A human-readable explanation specific to this occurrence of the problem.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "examples": [
+                            404
+                        ],
+                        "default": 400
+                    },
+                    "instance": {
+                        "readOnly": true,
+                        "description": "A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "type": {
+                        "readOnly": true,
+                        "description": "A URI reference that identifies the problem type",
+                        "type": "string"
+                    }
+                }
+            },
+            "Error.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "readOnly": true,
+                                "description": "A short, human-readable summary of the problem.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "detail": {
+                                "readOnly": true,
+                                "description": "A human-readable explanation specific to this occurrence of the problem.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "status": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ],
+                                "examples": [
+                                    404
+                                ],
+                                "default": 400
+                            },
+                            "instance": {
+                                "readOnly": true,
+                                "description": "A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "type": {
+                                "readOnly": true,
+                                "description": "A URI reference that identifies the problem type",
+                                "type": "string"
+                            },
+                            "description": {
+                                "readOnly": true,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "description": "A representation of common errors."
+            },
+            "FacetValue": {
+                "type": "object",
+                "required": [
+                    "value",
+                    "count"
+                ],
+                "properties": {
+                    "value": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "description": "Nombre de produits obtenus en ajoutant cette valeur aux filtres des autres facettes.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "FacetValue.jsonld": {
+                "type": "object",
+                "required": [
+                    "value",
+                    "count"
+                ],
+                "properties": {
+                    "value": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "description": "Nombre de produits obtenus en ajoutant cette valeur aux filtres des autres facettes.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "HydraCollectionBaseSchema": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "view": {
+                                "type": "object",
+                                "properties": {
+                                    "@id": {
+                                        "type": "string",
+                                        "format": "iri-reference"
+                                    },
+                                    "@type": {
+                                        "type": "string"
+                                    },
+                                    "first": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "iri-reference"
+                                    },
+                                    "last": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "iri-reference"
+                                    },
+                                    "previous": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "iri-reference"
+                                    },
+                                    "next": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "iri-reference"
+                                    }
+                                },
+                                "example": {
+                                    "@id": "string",
+                                    "@type": "string",
+                                    "first": "string",
+                                    "last": "string",
+                                    "previous": "string",
+                                    "next": "string"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "HydraCollectionBaseSchemaNoPagination": {
+                "type": "object",
+                "properties": {
+                    "totalItems": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "search": {
+                        "type": "object",
+                        "properties": {
+                            "@type": {
+                                "type": "string"
+                            },
+                            "template": {
+                                "type": "string"
+                            },
+                            "variableRepresentation": {
+                                "type": "string"
+                            },
+                            "mapping": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "@type": {
+                                            "type": "string"
+                                        },
+                                        "variable": {
+                                            "type": "string"
+                                        },
+                                        "property": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "required": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "HydraItemBaseSchema": {
+                "type": "object",
+                "properties": {
+                    "@context": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "@vocab": {
+                                        "type": "string"
+                                    },
+                                    "hydra": {
+                                        "type": "string",
+                                        "enum": [
+                                            "http://www.w3.org/ns/hydra/core#"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "@vocab",
+                                    "hydra"
+                                ],
+                                "additionalProperties": true
+                            }
+                        ]
+                    },
+                    "@id": {
+                        "type": "string"
+                    },
+                    "@type": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "@id",
+                    "@type"
+                ]
+            },
+            "ProductFacets": {
+                "type": "object",
+                "required": [
+                    "exposure",
+                    "size",
+                    "category"
+                ],
+                "properties": {
+                    "exposure": {
+                        "description": "Toutes les expositions, y compris \u00e0 0.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FacetValue"
+                        }
+                    },
+                    "size": {
+                        "description": "Toutes les tailles, y compris \u00e0 0.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FacetValue"
+                        }
+                    },
+                    "category": {
+                        "description": "Sous-cat\u00e9gories directes de la cat\u00e9gorie filtr\u00e9e (cat\u00e9gories racines sans filtre). Vide sur une feuille.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CategoryFacetValue"
+                        }
+                    }
+                }
+            },
+            "ProductFacets.jsonld": {
+                "type": "object",
+                "required": [
+                    "exposure",
+                    "size",
+                    "category"
+                ],
+                "properties": {
+                    "exposure": {
+                        "description": "Toutes les expositions, y compris \u00e0 0.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FacetValue.jsonld"
+                        }
+                    },
+                    "size": {
+                        "description": "Toutes les tailles, y compris \u00e0 0.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FacetValue.jsonld"
+                        }
+                    },
+                    "category": {
+                        "description": "Sous-cat\u00e9gories directes de la cat\u00e9gorie filtr\u00e9e (cat\u00e9gories racines sans filtre). Vide sur une feuille.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CategoryFacetValue.jsonld"
+                        }
+                    }
+                }
+            },
+            "ProductItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "categorySlug",
+                    "price",
+                    "exposure",
+                    "size",
+                    "inStock",
+                    "image"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "categorySlug": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Prix en centimes.",
+                        "type": "integer"
+                    },
+                    "exposure": {
+                        "type": "string",
+                        "enum": [
+                            "soleil",
+                            "mi-ombre",
+                            "ombre"
+                        ]
+                    },
+                    "size": {
+                        "type": "string",
+                        "enum": [
+                            "S",
+                            "M",
+                            "L"
+                        ]
+                    },
+                    "inStock": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "description": "Index du visuel partag\u00e9, de 1 \u00e0 12.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "ProductItem.jsonld": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "categorySlug",
+                    "price",
+                    "exposure",
+                    "size",
+                    "inStock",
+                    "image"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "categorySlug": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Prix en centimes.",
+                        "type": "integer"
+                    },
+                    "exposure": {
+                        "type": "string",
+                        "enum": [
+                            "soleil",
+                            "mi-ombre",
+                            "ombre"
+                        ]
+                    },
+                    "size": {
+                        "type": "string",
+                        "enum": [
+                            "S",
+                            "M",
+                            "L"
+                        ]
+                    },
+                    "inStock": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "description": "Index du visuel partag\u00e9, de 1 \u00e0 12.",
+                        "type": "integer"
+                    }
+                }
+            },
+            "ProductList": {
+                "type": "object",
+                "description": "Liste les produits du catalogue. Les filtres se combinent en ET, les valeurs d'une m\u00eame facette en OU. Une valeur invalide (inconnue, non num\u00e9rique, hors bornes) est ignor\u00e9e et remplac\u00e9e par la valeur par d\u00e9faut.",
+                "required": [
+                    "items",
+                    "totalItems",
+                    "page",
+                    "itemsPerPage",
+                    "totalPages",
+                    "facets"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductItem"
+                        }
+                    },
+                    "totalItems": {
+                        "description": "Nombre total de produits filtr\u00e9s, toutes pages confondues.",
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "itemsPerPage": {
+                        "type": "integer"
+                    },
+                    "totalPages": {
+                        "description": "Nombre de pages, 0 si aucun r\u00e9sultat.",
+                        "type": "integer"
+                    },
+                    "facets": {
+                        "$ref": "#/components/schemas/ProductFacets"
+                    }
+                }
+            },
+            "ProductList.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "items",
+                            "totalItems",
+                            "page",
+                            "itemsPerPage",
+                            "totalPages",
+                            "facets"
+                        ],
+                        "properties": {
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ProductItem.jsonld"
+                                }
+                            },
+                            "totalItems": {
+                                "description": "Nombre total de produits filtr\u00e9s, toutes pages confondues.",
+                                "type": "integer"
+                            },
+                            "page": {
+                                "type": "integer"
+                            },
+                            "itemsPerPage": {
+                                "type": "integer"
+                            },
+                            "totalPages": {
+                                "description": "Nombre de pages, 0 si aucun r\u00e9sultat.",
+                                "type": "integer"
+                            },
+                            "facets": {
+                                "$ref": "#/components/schemas/ProductFacets.jsonld"
+                            }
+                        }
+                    }
+                ],
+                "description": "Liste les produits du catalogue. Les filtres se combinent en ET, les valeurs d'une m\u00eame facette en OU. Une valeur invalide (inconnue, non num\u00e9rique, hors bornes) est ignor\u00e9e et remplac\u00e9e par la valeur par d\u00e9faut."
+            },
+            "Task": {
+                "type": "object",
+                "description": "Liste toutes les t\u00e2ches, sans pagination.",
+                "required": [
+                    "id",
+                    "title",
+                    "done"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "done": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "Task.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "title",
+                            "done"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "title": {
+                                "type": "string"
+                            },
+                            "done": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                ],
+                "description": "Liste toutes les t\u00e2ches, sans pagination."
+            }
+        },
+        "responses": {},
+        "parameters": {},
+        "examples": {},
+        "requestBodies": {},
+        "headers": {},
+        "securitySchemes": {}
+    },
+    "security": [],
+    "tags": [
+        {
+            "name": "Article",
+            "description": "Article du blog affich\u00e9 sur la page d'accueil."
+        },
+        {
+            "name": "Category",
+            "description": "Cat\u00e9gorie du catalogue, avec ses sous-cat\u00e9gories imbriqu\u00e9es."
+        },
+        {
+            "name": "ProductList",
+            "description": "Page de produits filtr\u00e9s, avec le total et les compteurs de facettes disjonctifs."
+        },
+        {
+            "name": "ContactMessage",
+            "description": "Message envoy\u00e9 depuis le formulaire de contact."
+        },
+        {
+            "name": "Task",
+            "description": "T\u00e2che de la liste de d\u00e9monstration."
+        }
+    ],
+    "webhooks": {}
+}

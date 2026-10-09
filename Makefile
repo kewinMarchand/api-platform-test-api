@@ -1,0 +1,48 @@
+.DEFAULT_GOAL := help
+
+export HOST_UID := $(shell id -u)
+export HOST_GID := $(shell id -g)
+
+COMPOSE ?= docker compose
+# Préfixe des commandes PHP. En CI il est vidé (EXEC=) : les commandes tournent sur le runner.
+EXEC ?= $(COMPOSE) exec -T php
+CONSOLE = $(EXEC) php bin/console
+COMPOSER = $(EXEC) composer
+
+include Makefile.qa.mk
+
+help: ## Affiche cette aide
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+
+install: build up ## Construit l'image, lance les conteneurs et installe les dépendances
+	$(COMPOSER) install
+
+build: ## Construit l'image Docker de développement
+	$(COMPOSE) build
+
+up: ## Lance l'API (http://localhost:8090) et PostgreSQL
+	$(COMPOSE) up -d --wait
+
+down: ## Arrête les conteneurs (la base est conservée dans son volume)
+	$(COMPOSE) down
+
+logs: ## Suit les journaux des conteneurs
+	$(COMPOSE) logs -f
+
+sh: ## Ouvre un shell dans le conteneur PHP
+	$(COMPOSE) exec php sh
+
+db-reset: ## Recrée la base de dev, joue les migrations et charge les fixtures
+	$(CONSOLE) doctrine:database:drop --force --if-exists
+	$(CONSOLE) doctrine:database:create
+	$(CONSOLE) doctrine:migrations:migrate --no-interaction
+	$(CONSOLE) doctrine:fixtures:load --no-interaction
+
+openapi: ## Exporte le schéma OpenAPI dans openapi.json
+	$(CONSOLE) api:openapi:export --output=openapi.json
+
+docker-build-prod: ## Construit l'image de production
+	docker build --target prod -t api-platform-test-api:prod .
+
+.PHONY: help install build up down logs sh db-reset openapi docker-build-prod

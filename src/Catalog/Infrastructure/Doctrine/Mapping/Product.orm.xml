@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Catalog\Domain\Product" table="product">
+        <id name="id" type="integer">
+            <generator strategy="IDENTITY"/>
+        </id>
+        <field name="slug" type="string" length="255" unique="true"/>
+        <field name="name" type="string" length="255"/>
+        <field name="price" type="integer"/>
+        <field name="exposure" type="string" length="16" enum-type="App\Catalog\Domain\Exposure"/>
+        <field name="size" type="string" length="1" enum-type="App\Catalog\Domain\Size"/>
+        <field name="inStock" type="boolean"/>
+        <field name="image" type="smallint"/>
+        <many-to-one field="category" target-entity="App\Catalog\Domain\Category">
+            <join-column name="category_id" referenced-column-name="id" nullable="false"/>
+        </many-to-one>
+    </entity>
+</doctrine-mapping>
