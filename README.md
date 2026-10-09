@@ -176,7 +176,7 @@ L'API n'écoute que sur `127.0.0.1:8090`. Un front servi par Docker n'y accède 
 
 ## Architecture
 
-Hexagonale légère, un dossier par contexte métier :
+Hexagonale légère. L'API est un seul contexte borné, découpé en un module par sous-domaine :
 
 ```
 src/
@@ -199,8 +199,8 @@ Le domaine ne dépend ni de Doctrine ni d'API Platform : le mapping Doctrine est
 
 ### Ajouter une ressource en lecture
 
-1. Créer `src/<Contexte>/Domain/<Modele>.php` et l'interface du dépôt.
-2. Ajouter le mapping `src/<Contexte>/Infrastructure/Doctrine/Mapping/<Modele>.orm.xml`, le dépôt Doctrine et la fixture.
+1. Créer `src/<Module>/Domain/<Modele>.php` et l'interface du dépôt.
+2. Ajouter le mapping `src/<Module>/Infrastructure/Doctrine/Mapping/<Modele>.orm.xml`, le dépôt Doctrine et la fixture.
 3. Déclarer le mapping dans `config/packages/doctrine.yaml` et le dossier de ressources dans `config/packages/api_platform.yaml`.
 4. Créer la ressource et son provider dans `Infrastructure/ApiPlatform/`.
 5. `bin/console doctrine:migrations:diff`, `make db-reset`, `make openapi`, puis un test dans `tests/Functional/`.
