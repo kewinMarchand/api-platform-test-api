@@ -1,0 +1,63 @@
+# Règles de dépendance entre modules et couches (R12 de ARCHITECTURE-DDD.md).
+# Domain ne dépend que de lui-même (ni framework, ni autre couche), Application du Domain de son
+# module, Infrastructure de son module, de Shared et des frameworks. Aucun module n'en importe un autre.
+# make arch-selftest vérifie qu'une violation volontaire fait bien échouer l'analyse.
+deptrac:
+    paths:
+        - ./src
+    layers:
+        - name: CatalogDomain
+          collectors:
+            - type: classLike
+              value: '^App\\Catalog\\Domain\\'
+        - name: CatalogApplication
+          collectors:
+            - type: classLike
+              value: '^App\\Catalog\\Application\\'
+        - name: CatalogInfrastructure
+          collectors:
+            - type: classLike
+              value: '^App\\Catalog\\Infrastructure\\'
+        - name: BlogDomain
+          collectors:
+            - type: classLike
+              value: '^App\\Blog\\Domain\\'
+        - name: BlogInfrastructure
+          collectors:
+            - type: classLike
+              value: '^App\\Blog\\Infrastructure\\'
+        - name: ContactDomain
+          collectors:
+            - type: classLike
+              value: '^App\\Contact\\Domain\\'
+        - name: ContactInfrastructure
+          collectors:
+            - type: classLike
+              value: '^App\\Contact\\Infrastructure\\'
+        - name: TaskDomain
+          collectors:
+            - type: classLike
+              value: '^App\\Task\\Domain\\'
+        - name: TaskInfrastructure
+          collectors:
+            - type: classLike
+              value: '^App\\Task\\Infrastructure\\'
+        - name: SharedInfrastructure
+          collectors:
+            - type: classLike
+              value: '^App\\Shared\\Infrastructure\\'
+        - name: Framework
+          collectors:
+            - type: classLike
+              value: '^(Symfony|Doctrine|ApiPlatform|Psr)\\'
+    ruleset:
+        CatalogDomain: ~
+        CatalogApplication: [CatalogDomain]
+        CatalogInfrastructure: [CatalogDomain, CatalogApplication, SharedInfrastructure, Framework]
+        BlogDomain: ~
+        BlogInfrastructure: [BlogDomain, SharedInfrastructure, Framework]
+        ContactDomain: ~
+        ContactInfrastructure: [ContactDomain, SharedInfrastructure, Framework]
+        TaskDomain: ~
+        TaskInfrastructure: [TaskDomain, SharedInfrastructure, Framework]
+        SharedInfrastructure: [Framework]

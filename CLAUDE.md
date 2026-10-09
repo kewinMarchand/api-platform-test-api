@@ -36,6 +36,7 @@ API de test commune aux boilerplates front. Les conventions générales sont dan
 - `symfony/twig-bundle`, `symfony/asset` : Swagger UI sur `/api/docs`.
 - `phpstan/phpdoc-parser`, `phpdocumentor/type-resolver` : sans les deux, Symfony n'enregistre pas `PhpStanExtractor`, PropertyInfo ignore les `@param list<X>` et l'OpenAPI type les tableaux imbriqués (`items`, `facets`, `children`) en `(string | null)[]`.
 - `ext-intl` : tri des noms en collation française (`\Collator`).
+- `deptrac/deptrac` (dev) : vérifie les règles de dépendance entre modules et couches (`deptrac.yaml`, `make arch`). Un `grep` ne voit pas les noms qualifiés ni les imports indirects. `make arch-selftest` écrit une violation volontaire (`Catalog\Domain` vers `Catalog\Infrastructure`), exige que deptrac échoue sur elle, puis retire le fichier : une règle qu'aucun test ne viole peut être débranchée sans bruit. Les deux tournent dans `make qa`, donc en CI.
 - `doctrine/doctrine-fixtures-bundle` (dev) : `make db-reset` et la base de test.
 - `symfony/browser-kit`, `symfony/http-client` (dev) : requis par `ApiTestCase`.
 - Extensions PHPStan incluses à la main dans `phpstan.dist.neon`, sans `phpstan/extension-installer`.

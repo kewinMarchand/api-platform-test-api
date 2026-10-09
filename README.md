@@ -52,7 +52,9 @@ Le projet Compose s'appelle `api-platform-test-api` : ses conteneurs, son résea
 | `make install`  | Construit l'image, lance les conteneurs, installe les dépendances         |
 | `make up` / `make down` | Lance ou arrête les conteneurs (la base est conservée)            |
 | `make db-reset` | Recrée la base de dev, joue les migrations, charge les fixtures           |
-| `make qa`       | Lint, format, PHPStan, contrôle de `openapi.json`, tests                  |
+| `make qa`       | Lint, architecture, format, PHPStan, contrôle de `openapi.json`, tests    |
+| `make arch`     | deptrac : règles de dépendance entre modules et couches (`deptrac.yaml`)  |
+| `make arch-selftest` | Écrit une violation volontaire, exige l'échec de deptrac, puis la retire |
 | `make lint`     | `composer validate`, `lint:container`, `lint:yaml`, `doctrine:schema:validate` |
 | `make format`   | PHP-CS-Fixer en écriture (`make format-check` pour vérifier)              |
 | `make typecheck` | PHPStan, niveau max, extensions Symfony et Doctrine                      |
@@ -198,7 +200,7 @@ tests/
   Integration/              enregistrement de X-Scenario selon l'environnement
 ```
 
-Le domaine ne dépend ni de Doctrine ni d'API Platform : le mapping Doctrine est en XML dans l'infrastructure, et les ressources API Platform sont des classes à part, construites depuis le modèle (`fromModel`). La validation porte sur la ressource, frontière de l'API.
+Les règles sont vérifiées par deptrac (`make arch`) : `Domain` ne dépend que de lui-même, `Application` du `Domain` de son module, `Infrastructure` de son module, de `Shared` et des frameworks, et aucun module n'en importe un autre. Le domaine ne dépend ni de Doctrine ni d'API Platform : le mapping Doctrine est en XML dans l'infrastructure, et les ressources API Platform sont des classes à part, construites depuis le modèle (`fromModel`). La validation porte sur la ressource, frontière de l'API.
 
 ### Ajouter une ressource en lecture
 
