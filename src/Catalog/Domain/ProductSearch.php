@@ -14,19 +14,17 @@ namespace App\Catalog\Domain;
 final class ProductSearch
 {
     /**
-     * @param list<Product>  $products
-     * @param list<Category> $categories
+     * @param list<Product> $products
      */
-    public function search(array $products, array $categories, ProductCriteria $criteria): ProductSearchResult
+    public function search(array $products, CategoryTree $tree, ProductCriteria $criteria): ProductSearchResult
     {
-        $current = null === $criteria->categorySlug ? null : $this->findCategory($categories, $criteria->categorySlug);
-        $branch = $this->branchSlugs($categories, $current);
+        $current = null === $criteria->categorySlug ? null : $tree->find($criteria->categorySlug);
+        $branch = $tree->branchSlugs($current);
 
         $inBranch = static fn (Product $product): bool => isset($branch[$product->getCategory()->getSlug()]);
         $matchesExposure = static fn (Product $product): bool => [] === $criteria->exposures || \in_array($product->getExposure(), $criteria->exposures, true);
         $matchesSize = static fn (Product $product): bool => [] === $criteria->sizes || \in_array($product->getSize(), $criteria->sizes, true);
-        $matchesOthers = static fn (Product $product): bool => (null === $criteria->priceMin || $product->getPrice() >= $criteria->priceMin)
-            && (null === $criteria->priceMax || $product->getPrice() <= $criteria->priceMax)
+        $matchesOthers = static fn (Product $product): bool => $product->getPrice()->isBetween($criteria->priceMin, $criteria->priceMax)
             && (!$criteria->inStockOnly || $product->isInStock());
 
         $results = array_values(array_filter(
@@ -51,8 +49,8 @@ final class ProductSearch
         }
 
         $categoryCounts = [];
-        foreach ($this->children($categories, $current) as $child) {
-            $childBranch = $this->branchSlugs($categories, $child);
+        foreach ($tree->childrenOf($current) as $child) {
+            $childBranch = $tree->branchSlugs($child);
             $categoryCounts[] = ['category' => $child, 'count' => \count(array_filter(
                 $products,
                 static fn (Product $product): bool => isset($childBranch[$product->getCategory()->getSlug()]) && $matchesExposure($product) && $matchesSize($product) && $matchesOthers($product),
@@ -63,53 +61,6 @@ final class ProductSearch
         $items = \array_slice($sorted, ($criteria->page - 1) * $criteria->itemsPerPage, $criteria->itemsPerPage);
 
         return new ProductSearchResult($items, \count($results), $exposureCounts, $sizeCounts, $categoryCounts);
-    }
-
-    /**
-     * @param list<Category> $categories
-     */
-    private function findCategory(array $categories, string $slug): Category
-    {
-        foreach ($categories as $category) {
-            if ($category->getSlug() === $slug) {
-                return $category;
-            }
-        }
-
-        throw new CategoryNotFound($slug);
-    }
-
-    /**
-     * @param list<Category> $categories
-     *
-     * @return list<Category>
-     */
-    private function children(array $categories, ?Category $parent): array
-    {
-        $children = array_values(array_filter($categories, static fn (Category $category): bool => $category->getParent() === $parent));
-        usort($children, static fn (Category $a, Category $b): int => $a->getPosition() <=> $b->getPosition());
-
-        return $children;
-    }
-
-    /**
-     * @param list<Category> $categories
-     *
-     * @return array<string, true> slugs de la catégorie et de toutes ses descendantes (tout le catalogue si null)
-     */
-    private function branchSlugs(array $categories, ?Category $root): array
-    {
-        $slugs = [];
-        foreach ($categories as $category) {
-            for ($ancestor = $category; null !== $ancestor; $ancestor = $ancestor->getParent()) {
-                if (null === $root || $ancestor === $root) {
-                    $slugs[$category->getSlug()] = true;
-                    break;
-                }
-            }
-        }
-
-        return $slugs;
     }
 
     /**
@@ -125,8 +76,8 @@ final class ProductSearch
 
         $collator = new \Collator('fr_FR');
         usort($products, static fn (Product $a, Product $b): int => match ($sort) {
-            ProductSort::PriceAsc => $a->getPrice() <=> $b->getPrice(),
-            ProductSort::PriceDesc => $b->getPrice() <=> $a->getPrice(),
+            ProductSort::PriceAsc => $a->getPrice()->compareTo($b->getPrice()),
+            ProductSort::PriceDesc => $b->getPrice()->compareTo($a->getPrice()),
             ProductSort::NameAsc => (int) $collator->compare($a->getName(), $b->getName()),
             ProductSort::NameDesc => (int) $collator->compare($b->getName(), $a->getName()),
         });

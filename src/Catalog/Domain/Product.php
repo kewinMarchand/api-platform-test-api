@@ -8,20 +8,23 @@ class Product
 {
     private ?int $id = null;
 
+    /** Centimes, colonne entière : le value object est reconstruit à la lecture. */
+    private int $price;
+
     /**
-     * @param int $price prix en centimes
      * @param int $image index du visuel partagé, de 1 à 12
      */
     public function __construct(
         private string $slug,
         private string $name,
         private Category $category,
-        private int $price,
+        Price $price,
         private Exposure $exposure,
         private Size $size,
         private bool $inStock,
         private int $image,
     ) {
+        $this->price = $price->cents;
     }
 
     public function getId(): ?int
@@ -44,9 +47,9 @@ class Product
         return $this->category;
     }
 
-    public function getPrice(): int
+    public function getPrice(): Price
     {
-        return $this->price;
+        return Price::fromCents($this->price);
     }
 
     public function getExposure(): Exposure

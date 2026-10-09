@@ -6,6 +6,7 @@ namespace App\Catalog\Infrastructure\Doctrine\Fixtures;
 
 use App\Catalog\Domain\Category;
 use App\Catalog\Domain\Exposure;
+use App\Catalog\Domain\Price;
 use App\Catalog\Domain\Product;
 use App\Catalog\Domain\Size;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -81,7 +82,7 @@ final class CatalogFixtures extends Fixture
                 $slug,
                 $name,
                 $categories[$categorySlug],
-                $price,
+                Price::fromCents($price),
                 Exposure::from($exposure),
                 Size::from($size),
                 $inStock,

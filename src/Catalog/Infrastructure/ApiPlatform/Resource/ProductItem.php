@@ -38,7 +38,7 @@ final readonly class ProductItem
             $product->getSlug(),
             $product->getName(),
             $product->getCategory()->getSlug(),
-            $product->getPrice(),
+            $product->getPrice()->cents,
             $product->getExposure()->value,
             $product->getSize()->value,
             $product->isInStock(),

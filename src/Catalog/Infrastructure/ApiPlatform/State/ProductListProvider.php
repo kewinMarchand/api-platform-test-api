@@ -9,7 +9,9 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Catalog\Domain\CategoryRepository;
+use App\Catalog\Domain\CategoryTree;
 use App\Catalog\Domain\Exposure;
+use App\Catalog\Domain\Price;
 use App\Catalog\Domain\ProductCriteria;
 use App\Catalog\Domain\ProductRepository;
 use App\Catalog\Domain\ProductSearch;
@@ -40,7 +42,7 @@ final readonly class ProductListProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ProductListResource
     {
         $criteria = $this->criteria($operation);
-        $result = $this->productSearch->search($this->productRepository->findAll(), $this->categoryRepository->findAll(), $criteria);
+        $result = $this->productSearch->search($this->productRepository->findAll(), new CategoryTree($this->categoryRepository->findAll()), $criteria);
 
         return new ProductListResource(
             array_map(ProductItem::fromModel(...), $result->items),
@@ -92,8 +94,8 @@ final readonly class ProductListProvider implements ProviderInterface
                 static fn (mixed $size): ?Size => \is_string($size) ? Size::tryFrom($size) : null,
                 (array) $value('size'),
             ))),
-            priceMin: $this->toInt($value('priceMin')),
-            priceMax: $this->toInt($value('priceMax')),
+            priceMin: $this->toPrice($value('priceMin')),
+            priceMax: $this->toPrice($value('priceMax')),
             inStockOnly: \in_array($value('inStock'), [true, 'true', '1'], true),
             sort: match (true) {
                 'asc' === $value('order[price]') => ProductSort::PriceAsc,
@@ -112,6 +114,13 @@ final readonly class ProductListProvider implements ProviderInterface
         return null !== $itemsPerPage && $itemsPerPage >= 1 && $itemsPerPage <= self::MAX_ITEMS_PER_PAGE
             ? $itemsPerPage
             : ProductCriteria::DEFAULT_ITEMS_PER_PAGE;
+    }
+
+    private function toPrice(mixed $value): ?Price
+    {
+        $cents = $this->toInt($value);
+
+        return null === $cents ? null : Price::fromCents($cents);
     }
 
     /**

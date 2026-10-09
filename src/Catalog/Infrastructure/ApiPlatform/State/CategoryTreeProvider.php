@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Catalog\Domain\Category;
 use App\Catalog\Domain\CategoryRepository;
+use App\Catalog\Domain\CategoryTree;
 use App\Catalog\Infrastructure\ApiPlatform\Resource\CategoryResource;
 
 /**
@@ -24,28 +25,22 @@ final readonly class CategoryTreeProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        return $this->childrenOf($this->categoryRepository->findAll(), null);
+        return $this->nodes(new CategoryTree($this->categoryRepository->findAll()), null);
     }
 
     /**
-     * @param list<Category> $categories triées par position
-     *
      * @return list<CategoryResource>
      */
-    private function childrenOf(array $categories, ?Category $parent): array
+    private function nodes(CategoryTree $tree, ?Category $parent): array
     {
-        $children = [];
-        foreach ($categories as $category) {
-            if ($category->getParent() === $parent) {
-                $children[] = new CategoryResource(
-                    $category->getSlug(),
-                    $category->getName(),
-                    $parent?->getSlug(),
-                    $this->childrenOf($categories, $category),
-                );
-            }
-        }
-
-        return $children;
+        return array_map(
+            fn (Category $category): CategoryResource => new CategoryResource(
+                $category->getSlug(),
+                $category->getName(),
+                $parent?->getSlug(),
+                $this->nodes($tree, $category),
+            ),
+            $tree->childrenOf($parent),
+        );
     }
 }
