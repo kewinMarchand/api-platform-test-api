@@ -218,6 +218,104 @@ Les règles sont vérifiées par deptrac (`make arch`) : `Domain` ne dépend que
 
 `.github/workflows/ci.yml` lance un PostgreSQL 17 en service, installe PHP 8.4 sur le runner, puis `make db-reset` et `make qa` avec `EXEC=` : le Makefile exécute alors les commandes directement, sans Docker.
 
+## Démarrer un projet à partir de ce dépôt
+
+Le dépôt est un modèle (« template ») sur GitHub. Deux façons d'en partir, selon le lien que le nouveau projet doit garder avec celui-ci.
+
+### Créer le dépôt
+
+**Nouveau projet (voie recommandée)** : bouton « Use this template » sur GitHub, ou en ligne de commande :
+
+```sh
+gh repo create mon-projet --template kewinMarchand/api-platform-test-api --private --clone
+```
+
+Le nouveau dépôt contient les fichiers de la branche `main`, avec un historique vierge et sans lien avec l'original.
+
+**Fork, pour suivre les évolutions de ce dépôt ou y contribuer** :
+
+```sh
+gh repo fork kewinMarchand/api-platform-test-api --clone
+```
+
+Le fork devient `origin` et le dépôt d'origine `upstream`. GitHub n'autorise pas un fork dans le compte qui possède déjà le dépôt : le propriétaire passe par le modèle ou par une organisation.
+
+### Récupérer les mises à jour plus tard
+
+Avec un fork, `upstream` existe déjà. Avec un dépôt créé depuis le modèle, l'ajouter une fois :
+
+```sh
+git remote add upstream https://github.com/kewinMarchand/api-platform-test-api.git
+git fetch upstream
+```
+
+Puis, selon l'origine du dépôt :
+
+- **Fork** : l'historique est commun, une fusion suffit.
+
+  ```sh
+  git merge upstream/main
+  ```
+
+- **Dépôt créé depuis le modèle** : les historiques n'ont aucun commit commun et `git merge upstream/main` refuse de fusionner. Reprendre les commits utiles un par un, puis résoudre les conflits sur les fichiers personnalisés :
+
+  ```sh
+  git log --oneline upstream/main
+  git cherry-pick <commit>
+  ```
+
+### Personnaliser
+
+| Sujet | Où |
+| ----- | -- |
+| Nom du projet | `name:` et `image:` dans `compose.yaml` (ils nomment aussi le réseau et le volume `<nom>_database_data`), étiquette de `make docker-build-prod` dans `Makefile`, titre du README, `LICENSE` |
+| Paquet Composer | `name` et `description` de `composer.json`, puis `docker compose exec php composer update --lock` |
+| Titre de l'API | `title`, `description` et `version` dans `config/packages/api_platform.yaml` |
+| Ports | port publié `API_PORT` (8090 par défaut) dans `compose.yaml`, et la mention du port dans la cible `up` du `Makefile`. Le conteneur écoute sur 8080, PostgreSQL n'est pas publié |
+| Variables d'environnement | `.env` (`DATABASE_URL`, `CORS_ALLOW_ORIGIN`, `DEFAULT_URI`), `.env.test`. Les surcharges locales vont dans `.env.local`, jamais versionné |
+| Secrets | régénérer `APP_SECRET` dans `.env.dev` (valeur de développement versionnée). En production, `APP_SECRET` et `DATABASE_URL` viennent de l'environnement, rien n'est versionné |
+| PostgreSQL | utilisateur, mot de passe et base (`app`) dans `compose.yaml`, `.env` et `.github/workflows/ci.yml`. La version (17) dans l'image et dans `serverVersion` |
+| Scénarios `X-Scenario` | `src/Shared/Infrastructure/ApiPlatform/Scenario/`. Pour s'en passer : supprimer ce dossier, `tests/Functional/ScenarioHeaderTest.php`, `tests/Integration/ScenarioRegistrationTest.php`, puis retirer `X-Scenario` de `config/packages/nelmio_cors.yaml` et de `config/packages/api_platform.yaml` |
+| Contrat OpenAPI | `openapi.json` se régénère par `make openapi` et `make qa` vérifie qu'il est à jour. La comparaison `make contract` appartient au dépôt jumeau `hono-mongo-test-api` : elle ne concerne pas un projet qui n'a pas de seconde implémentation |
+| CORS | origines locales dans `CORS_ALLOW_ORIGIN` (`.env`) |
+| CI | `.github/workflows/ci.yml` : identifiants PostgreSQL et version de PHP |
+| Documentation | ce README et `CLAUDE.md`, qui décrivent les modules d'exemple |
+
+### Retirer les modules d'exemple
+
+`Task`, `Blog`, `Contact` et `Catalog` sont des exemples. Garder au moins un module avec un `Domain` et une `Infrastructure` tant que le premier module du projet n'existe pas : `make arch-selftest` écrit sa violation volontaire dans un module réel. L'exemple ci-dessous garde `Task` et retire les trois autres.
+
+1. Supprimer le code, les fixtures et les tests :
+
+   ```sh
+   rm -r src/Catalog src/Blog src/Contact tests/Unit
+   rm tests/Functional/ProductApiTest.php tests/Functional/CategoryApiTest.php \
+      tests/Functional/ArticleApiTest.php tests/Functional/ContactMessageApiTest.php
+   ```
+
+   Les fixtures sont dans `src/<Module>/Infrastructure/Doctrine/Fixtures/` et partent avec leur module.
+
+2. Dans `config/packages/doctrine.yaml`, retirer les entrées `Catalog`, `Blog` et `Contact` de `mappings`.
+3. Dans `config/packages/api_platform.yaml`, retirer leurs dossiers de `mapping.paths`, ainsi que `exception_to_status` (seule `CategoryNotFound` y figure).
+4. Dans `deptrac.yaml`, retirer les couches `Catalog*`, `Blog*` et `Contact*` et leurs lignes de `ruleset`.
+5. Dans `Makefile.qa.mk`, pointer `make arch-selftest` sur le module conservé : `ARCH_SELFTEST_FILE = src/Task/Domain/ArchSelftestViolation.php`, puis remplacer dans le `printf` et le `grep` de la cible `App\Catalog\Domain` par `App\Task\Domain`, `App\Catalog\Infrastructure\Doctrine\DoctrineProductRepository` par `App\Task\Infrastructure\Doctrine\DoctrineTaskRepository` (et le type du paramètre), `App\\Catalog\\Infrastructure` par `App\\Task\\Infrastructure`.
+6. Adapter les tests transverses qui visent les ressources retirées :
+   - `tests/Functional/ScenarioHeaderTest.php` : supprimer les tests sur `/api/products` et `/api/contact_messages`, et les entrées `articles` et `catégories` de `collections()`.
+   - `tests/Functional/CorsTest.php` : faire porter le test de prévol sur `/api/tasks` avec la méthode `GET`.
+7. Repartir d'une migration propre. La migration actuelle crée toutes les tables :
+
+   ```sh
+   rm migrations/Version*.php
+   docker compose exec php bin/console doctrine:database:drop --force
+   docker compose exec php bin/console doctrine:database:create
+   docker compose exec php bin/console doctrine:migrations:diff
+   make db-reset
+   make openapi
+   make qa
+   ```
+
+8. Mettre à jour ce README et `CLAUDE.md`, puis supprimer le module `Task` quand le premier module du projet le remplace dans `make arch-selftest`.
+
 ## Licence
 
 MIT
