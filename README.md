@@ -27,7 +27,7 @@ Tout est en lecture seule sauf le contact (un `POST` répond 405). Les collectio
 
 ## Prérequis
 
-- Docker avec Compose v2. Rien d'autre : PHP et Composer tournent dans le conteneur.
+- Docker avec Compose v2, `make` et git. Rien d'autre : PHP, Composer et PostgreSQL tournent dans les conteneurs.
 - Le port 8090 libre sur `127.0.0.1`.
 
 ## Démarrage
@@ -162,13 +162,7 @@ Les origines autorisées sont une expression régulière dans `CORS_ALLOW_ORIGIN
 
 ### Générer les types TypeScript
 
-Le schéma OpenAPI est servi à **`http://localhost:8090/api/docs.jsonopenapi`** (OpenAPI 3.2, `application/vnd.openapi+json`). Il est aussi versionné dans **`openapi.json`** à la racine, pour générer les types sans lancer l'API :
-
-```sh
-npx openapi-typescript ../api-platform-test-api/openapi.json -o src/core/api/schema.d.ts
-# ou, API lancée :
-npx openapi-typescript http://localhost:8090/api/docs.jsonopenapi -o src/core/api/schema.d.ts
-```
+Le schéma OpenAPI est servi à **`http://localhost:8090/api/docs.jsonopenapi`** (OpenAPI 3.2, `application/vnd.openapi+json`). Il est aussi versionné dans **`openapi.json`** à la racine, pour générer les types sans lancer l'API. Côté front, `make api-types` génère les types depuis le schéma désigné par `API_SCHEMA_URL` (voir le README du front).
 
 Les schémas utiles côté front sont `Task`, `Article`, `ContactMessage`, `ConstraintViolation`, `Category`, `ProductList`, `ProductItem`, `ProductFacets`, `FacetValue` et `CategoryFacetValue` (les variantes `.jsonld` concernent le JSON-LD). `make qa` échoue si `openapi.json` n'est plus à jour : relancer `make openapi` après toute modification d'une ressource.
 
@@ -208,7 +202,7 @@ Les règles sont vérifiées par deptrac (`make arch`) : `Domain` ne dépend que
 2. Ajouter le mapping `src/<Module>/Infrastructure/Doctrine/Mapping/<Modele>.orm.xml`, le dépôt Doctrine et la fixture.
 3. Déclarer le mapping dans `config/packages/doctrine.yaml` et le dossier de ressources dans `config/packages/api_platform.yaml`.
 4. Créer la ressource et son provider dans `Infrastructure/ApiPlatform/`.
-5. `bin/console doctrine:migrations:diff`, `make db-reset`, `make openapi`, puis un test dans `tests/Functional/`.
+5. `docker compose exec php bin/console doctrine:migrations:diff`, `make db-reset`, `make openapi`, puis un test dans `tests/Functional/`.
 
 ## Suivi des erreurs (GlitchTip)
 
@@ -220,7 +214,7 @@ Les erreurs inattendues (5xx réelles, exceptions non gérées) partent vers Gli
 
 ## Intégration continue
 
-`.github/workflows/ci.yml` lance un PostgreSQL 17 en service, installe PHP 8.4 sur le runner, puis `make db-reset` et `make qa` avec `EXEC=` : le Makefile exécute alors les commandes directement, sans Docker.
+`.github/workflows/ci.yml` appelle les mêmes cibles que le poste de dev, donc les mêmes conteneurs : `make install`, `make db-reset`, puis `make qa`. Rien n'est installé sur le runner en dehors de Docker.
 
 ## Démarrer un projet à partir de ce dépôt
 
@@ -228,7 +222,7 @@ Le dépôt est un modèle (« template ») sur GitHub. Deux façons d'en partir,
 
 ### Créer le dépôt
 
-**Nouveau projet (voie recommandée)** : bouton « Use this template » sur GitHub, ou en ligne de commande :
+**Nouveau projet (voie recommandée)** : bouton « Use this template » sur GitHub, ou avec la CLI GitHub (`gh`, facultative) :
 
 ```sh
 gh repo create mon-projet --template kewinMarchand/api-platform-test-api --private --clone
@@ -236,7 +230,7 @@ gh repo create mon-projet --template kewinMarchand/api-platform-test-api --priva
 
 Le nouveau dépôt contient les fichiers de la branche `main`, avec un historique vierge et sans lien avec l'original.
 
-**Fork, pour suivre les évolutions de ce dépôt ou y contribuer** :
+**Fork, pour suivre les évolutions de ce dépôt ou y contribuer** (bouton « Fork » sur GitHub, ou avec `gh`) :
 
 ```sh
 gh repo fork kewinMarchand/api-platform-test-api --clone
@@ -278,11 +272,11 @@ Puis, selon l'origine du dépôt :
 | Ports | port publié `API_PORT` (8090 par défaut) dans `compose.yaml`, et la mention du port dans la cible `up` du `Makefile`. Le conteneur écoute sur 8080, PostgreSQL n'est pas publié |
 | Variables d'environnement | `.env` (`DATABASE_URL`, `CORS_ALLOW_ORIGIN`, `DEFAULT_URI`), `.env.test`. Les surcharges locales vont dans `.env.local`, jamais versionné |
 | Secrets | régénérer `APP_SECRET` dans `.env.dev` (valeur de développement versionnée). En production, `APP_SECRET` et `DATABASE_URL` viennent de l'environnement, rien n'est versionné |
-| PostgreSQL | utilisateur, mot de passe et base (`app`) dans `compose.yaml`, `.env` et `.github/workflows/ci.yml`. La version (17) dans l'image et dans `serverVersion` |
+| PostgreSQL | utilisateur, mot de passe et base (`app`) dans `compose.yaml` et `.env`. La version (17) dans l'image et dans `serverVersion` |
 | Scénarios `X-Scenario` | `src/Shared/Infrastructure/ApiPlatform/Scenario/`. Pour s'en passer : supprimer ce dossier, `tests/Functional/ScenarioHeaderTest.php`, `tests/Integration/ScenarioRegistrationTest.php`, puis retirer `X-Scenario` de `config/packages/nelmio_cors.yaml` et de `config/packages/api_platform.yaml` |
 | Contrat OpenAPI | `openapi.json` se régénère par `make openapi` et `make qa` vérifie qu'il est à jour. La comparaison `make contract` appartient au dépôt jumeau `hono-mongo-test-api` : elle ne concerne pas un projet qui n'a pas de seconde implémentation |
 | CORS | origines locales dans `CORS_ALLOW_ORIGIN` (`.env`) |
-| CI | `.github/workflows/ci.yml` : identifiants PostgreSQL et version de PHP |
+| CI | `.github/workflows/ci.yml` appelle `make` : les identifiants PostgreSQL et la version de PHP viennent de `compose.yaml` et du `Dockerfile` |
 | Documentation | ce README et `CLAUDE.md`, qui décrivent les modules d'exemple |
 
 ### Retirer les modules d'exemple

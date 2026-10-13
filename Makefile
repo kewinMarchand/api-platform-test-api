@@ -4,7 +4,7 @@ export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
 
 COMPOSE ?= docker compose
-# Préfixe des commandes PHP. En CI il est vidé (EXEC=) : les commandes tournent sur le runner.
+# Préfixe des commandes PHP : le conteneur php, en local comme en CI.
 EXEC ?= $(COMPOSE) exec -T php
 CONSOLE = $(EXEC) php bin/console
 COMPOSER = $(EXEC) composer

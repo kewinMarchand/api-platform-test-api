@@ -17,6 +17,7 @@ API de test commune aux boilerplates front. Les conventions générales sont dan
 - **`category` inconnue** : `CategoryNotFound` (domaine) est mappée en 404 par `exception_to_status`.
 - **X-Scenario** : `ScenarioProvider` décore `api_platform.state_provider.main` en priorité 400, entre la désérialisation (300) et la lecture (500). Enregistré par `#[When('dev')]` et `#[When('test')]`. Pour une opération non collection, `empty` demande à la ressource sa forme vide via l'interface `EmptyScenarioResult` (implémentée par `ProductListResource`).
 - **CORS** : regex dans `CORS_ALLOW_ORIGIN`, limitée aux chemins `^/api/`.
+- **Prérequis** : Docker avec Compose, `make` et git, rien d'autre (section 18 de `SPEC-COMMUNE.md`). Toute commande passe par `make` et les conteneurs, en local comme en CI. `EXEC` reste surchargeable, sans usage aujourd'hui.
 - **Docker** : FrankenPHP (un seul conteneur pour HTTP et PHP), image dev lancée avec l'UID de l'hôte (`HOST_UID`/`HOST_GID` exportés par le Makefile), donc écoute sur 8080 dans le conteneur. PostgreSQL non publié sur l'hôte.
 
 ## Versions, et pourquoi
