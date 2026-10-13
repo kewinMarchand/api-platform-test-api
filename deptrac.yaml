@@ -49,7 +49,7 @@ deptrac:
         - name: Framework
           collectors:
             - type: classLike
-              value: '^(Symfony|Doctrine|ApiPlatform|Psr)\\'
+              value: '^(Symfony|Doctrine|ApiPlatform|Psr|Sentry)\\'
     ruleset:
         CatalogDomain: ~
         CatalogApplication: [CatalogDomain]

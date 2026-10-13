@@ -210,6 +210,10 @@ Les règles sont vérifiées par deptrac (`make arch`) : `Domain` ne dépend que
 4. Créer la ressource et son provider dans `Infrastructure/ApiPlatform/`.
 5. `bin/console doctrine:migrations:diff`, `make db-reset`, `make openapi`, puis un test dans `tests/Functional/`.
 
+## Suivi des erreurs (GlitchTip)
+
+Les erreurs inattendues (5xx réelles, exceptions non gérées) partent vers GlitchTip par le SDK Sentry quand `GLITCHTIP_DSN` est renseigné, dans `.env.local` jamais versionné. Vide (valeur par défaut), rien n'est envoyé. `GLITCHTIP_ENVIRONMENT` nomme l'environnement, l'environnement Symfony (`APP_ENV`) à défaut. Aucune donnée personnelle, aucun corps de requête, aucune trace de performance. Les réponses attendues (404, 405, 422 de validation, `X-Scenario`) ne sont jamais remontées.
+
 ## Production
 
 `make docker-build-prod` construit une image multi-étapes : dépendances sans `require-dev`, `.env` compilé (`composer dump-env prod`), cache préchauffé, utilisateur `www-data`, port 8080. Elle attend `APP_SECRET` et `DATABASE_URL` en variables d'environnement. Les migrations se lancent à part (`bin/console doctrine:migrations:migrate`).

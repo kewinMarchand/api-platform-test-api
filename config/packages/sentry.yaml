@@ -1,0 +1,22 @@
+# Suivi des erreurs par GlitchTip (API compatible Sentry). Sans GLITCHTIP_DSN, rien n'est envoyé.
+# Ni donnée personnelle, ni corps de requête, ni trace de performance. Les erreurs attendues
+# (4xx, dont 404, 405 et 422, et scénarios X-Scenario) sont écartées par IgnoreExpectedErrors.
+sentry:
+    dsn: '%env(GLITCHTIP_DSN)%'
+    tracing:
+        enabled: false
+    options:
+        environment: '%env(default:kernel.environment:GLITCHTIP_ENVIRONMENT)%'
+        send_default_pii: false
+        traces_sample_rate: 0.0
+        max_request_body_size: none
+        before_send: App\Shared\Infrastructure\Observability\IgnoreExpectedErrors
+
+# En test, le SDK ne remplace pas les gestionnaires d'erreurs globaux de PHP : ils survivraient
+# d'un test à l'autre (PHPUnit les signale comme non retirés) et les erreurs restent à Symfony.
+# Les envois passent par un client HTTP factice : aucune instance réelle n'est contactée.
+when@test:
+    sentry:
+        register_error_handler: false
+        options:
+            http_client: App\Tests\Support\RecordingSentryHttpClient

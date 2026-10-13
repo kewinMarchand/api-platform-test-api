@@ -27,3 +27,4 @@ when@test:
         # Les tests provoquent volontairement des 422 et des 500 : leurs journaux noieraient la sortie de PHPUnit.
         logger:
             class: Psr\Log\NullLogger
+        App\Tests\Support\RecordingSentryHttpClient: ~
