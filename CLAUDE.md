@@ -16,6 +16,7 @@ API de test commune aux boilerplates front. Les conventions générales sont dan
 - **Paramètres invalides ignorés**, pas de 422 : c'est la règle des URL côté front, et les 422 générées par API Platform depuis le schéma des paramètres sont en anglais. D'où l'absence de `minimum`, `maximum` et `enum` sur les paramètres scalaires (voir pièges).
 - **`category` inconnue** : `CategoryNotFound` (domaine) est mappée en 404 par `exception_to_status`.
 - **X-Scenario** : `ScenarioProvider` décore `api_platform.state_provider.main` en priorité 400, entre la désérialisation (300) et la lecture (500). Enregistré par `#[When('dev')]` et `#[When('test')]`. Pour une opération non collection, `empty` demande à la ressource sa forme vide via l'interface `EmptyScenarioResult` (implémentée par `ProductListResource`).
+- **CSP** : `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` sur toutes les réponses sauf le HTML (`Shared/Infrastructure/Http/ContentSecurityPolicySubscriber`), même en-tête que l'API Hono. Une API JSON ne charge rien et ne s'affiche pas en iframe ; la Swagger UI de `/api/docs` charge ses scripts et en est exclue. CSP bloquante et sans `report-uri` : il n'y a pas de page dont collecter les violations.
 - **CORS** : regex dans `CORS_ALLOW_ORIGIN`, limitée aux chemins `^/api/`.
 - **Prérequis** : Docker avec Compose, `make` et git, rien d'autre (section 18 de `SPEC-COMMUNE.md`). Toute commande passe par `make` et les conteneurs, en local comme en CI. `EXEC` reste surchargeable, sans usage aujourd'hui.
 - **Docker** : FrankenPHP (un seul conteneur pour HTTP et PHP), image dev lancée avec l'UID de l'hôte (`HOST_UID`/`HOST_GID` exportés par le Makefile), donc écoute sur 8080 dans le conteneur. PostgreSQL non publié sur l'hôte.
@@ -45,6 +46,7 @@ API de test commune aux boilerplates front. Les conventions générales sont dan
 
 ## Pièges rencontrés
 
+- **CSP absente des erreurs en debug** : `ErrorListener::removeCspHeader` de Symfony retire la CSP des réponses d'erreur quand `kernel.debug` est vrai (dev et test). En prod, la 404 la porte. Le test ne vérifie donc que les réponses réussies. Et le `Content-Type` d'une page Twig n'est posé qu'à l'envoi : l'abonné le déduit du format de la requête.
 - **Recette Flex de doctrine-bundle** : elle ajoute un service `database` en PostgreSQL 16 dans `compose.yaml` et un `compose.override.yaml` qui publie le port 5432 sur un port aléatoire. Les deux ont été retirés. Surveiller après tout `composer require`.
 - **X-Scenario et la 500 en HTML** : la sous-requête qu'API Platform lance pour rendre l'erreur reprend les en-têtes, repasse dans le provider décoré et relance l'exception. Symfony retombait alors sur sa page HTML. D'où le test `request === mainRequest` dans `ScenarioProvider`.
 - **`#[When]` ne supprime pas la définition** : hors environnement ciblé, la classe reste dans le `ContainerBuilder` avec le tag `container.excluded`, retiré à la compilation. `ScenarioRegistrationTest` vérifie le tag, pas seulement `hasDefinition()`.
