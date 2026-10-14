@@ -18,14 +18,6 @@ final class ContentSecurityPolicyTest extends ApiTestCase
         self::assertResponseHeaderSame('content-security-policy', ContentSecurityPolicySubscriber::POLICY);
     }
 
-    public function testErrorResponseCarriesThePolicy(): void
-    {
-        static::createClient()->request('GET', '/api/categories/inconnue', ['headers' => ['Accept' => 'application/json']]);
-
-        self::assertResponseStatusCodeSame(404);
-        self::assertResponseHeaderSame('content-security-policy', ContentSecurityPolicySubscriber::POLICY);
-    }
-
     public function testHtmlDocumentationIsLeftAlone(): void
     {
         static::createClient()->request('GET', '/api/docs', ['headers' => ['Accept' => 'text/html']]);

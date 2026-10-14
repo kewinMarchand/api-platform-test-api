@@ -23,8 +23,11 @@ final class ContentSecurityPolicySubscriber implements EventSubscriberInterface
 
     public function onResponse(ResponseEvent $event): void
     {
+        $request = $event->getRequest();
         $response = $event->getResponse();
-        if (!$event->isMainRequest() || str_starts_with((string) $response->headers->get('Content-Type'), 'text/html')) {
+        // Le Content-Type d'une page Twig n'est posé qu'à l'envoi : le format de la requête le donne avant
+        $type = $response->headers->get('Content-Type') ?? $request->getMimeType((string) $request->getRequestFormat());
+        if (!$event->isMainRequest() || str_starts_with((string) $type, 'text/html')) {
             return;
         }
         $response->headers->set('Content-Security-Policy', self::POLICY);
