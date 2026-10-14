@@ -21,14 +21,14 @@ final class CatalogFixtures extends Fixture
      * slug => [nom, slug du parent].
      */
     private const array CATEGORIES = [
-        'plantes-interieur' => ['Plantes d\'intérieur', null],
+        'plantes-interieur' => ['Plantes d’intérieur', null],
         'feuillages' => ['Feuillages', 'plantes-interieur'],
         'monstera' => ['Monstera', 'feuillages'],
         'fougeres' => ['Fougères', 'feuillages'],
         'plantes-a-fleurs' => ['Plantes à fleurs', 'plantes-interieur'],
         'anthurium' => ['Anthurium', 'plantes-a-fleurs'],
         'strelitzia' => ['Strelitzia', 'plantes-a-fleurs'],
-        'plantes-exterieur' => ['Plantes d\'extérieur', null],
+        'plantes-exterieur' => ['Plantes d’extérieur', null],
         'palmiers' => ['Palmiers', 'plantes-exterieur'],
         'arbustes-a-fleurs' => ['Arbustes à fleurs', 'plantes-exterieur'],
         'heliconia' => ['Heliconia', 'arbustes-a-fleurs'],

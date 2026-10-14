@@ -16,7 +16,7 @@ final class CategoryApiTest extends ApiTestCase
 
         self::assertResponseIsSuccessful();
         self::assertJsonEquals([
-            self::node('plantes-interieur', 'Plantes d\'intérieur', null, [
+            self::node('plantes-interieur', 'Plantes d’intérieur', null, [
                 self::node('feuillages', 'Feuillages', 'plantes-interieur', [
                     self::node('monstera', 'Monstera', 'feuillages'),
                     self::node('fougeres', 'Fougères', 'feuillages'),
@@ -26,7 +26,7 @@ final class CategoryApiTest extends ApiTestCase
                     self::node('strelitzia', 'Strelitzia', 'plantes-a-fleurs'),
                 ]),
             ]),
-            self::node('plantes-exterieur', 'Plantes d\'extérieur', null, [
+            self::node('plantes-exterieur', 'Plantes d’extérieur', null, [
                 self::node('palmiers', 'Palmiers', 'plantes-exterieur'),
                 self::node('arbustes-a-fleurs', 'Arbustes à fleurs', 'plantes-exterieur', [
                     self::node('heliconia', 'Heliconia', 'arbustes-a-fleurs'),

@@ -122,7 +122,7 @@ Jardinerie tropicale fictive : 3 catégories racines, 14 catégories sur 3 nivea
   "facets": {
     "exposure": [{ "value": "soleil", "count": 14 }, { "value": "mi-ombre", "count": 7 }, { "value": "ombre", "count": 3 }],
     "size": [{ "value": "S", "count": 6 }, { "value": "M", "count": 9 }, { "value": "L", "count": 9 }],
-    "category": [{ "slug": "plantes-interieur", "name": "Plantes d'intérieur", "count": 12 }, ...]
+    "category": [{ "slug": "plantes-interieur", "name": "Plantes d’intérieur", "count": 12 }, ...]
   }
 }
 ```

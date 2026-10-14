@@ -19,7 +19,7 @@ final class CategoryTreeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->interior = new Category('plantes-interieur', 'Plantes d\'intérieur', 1);
+        $this->interior = new Category('plantes-interieur', 'Plantes d’intérieur', 1);
         $this->foliage = new Category('feuillages', 'Feuillages', 2, $this->interior);
         $this->monstera = new Category('monstera', 'Monstera', 3, $this->foliage);
         $this->aquatic = new Category('plantes-aquatiques', 'Plantes aquatiques', 4);
