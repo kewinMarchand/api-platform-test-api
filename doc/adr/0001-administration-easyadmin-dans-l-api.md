@@ -1,7 +1,7 @@
 # 0001 — Administration du catalogue et des contenus par EasyAdmin, dans l'API
 
 - **Statut** : Acceptée
-- **Date** : 2026-10-14
+- **Introduite par** : commit `46df658`
 - **Décideurs** : Kewin Marchand
 - **Révise** : `boilerplates-commun/ARCHITECTURE-DDD.md` §2.2, §4.4.2 et §5 (« le catalogue n'a aucune écriture ») et le rôle décrit dans `CLAUDE.md` (« pas d'authentification, pas d'écriture hors contact »), une fois acceptée.
 
