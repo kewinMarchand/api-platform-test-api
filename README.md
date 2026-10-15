@@ -158,7 +158,7 @@ curl -i http://localhost:8090/api/tasks -H 'X-Scenario: empty'
 
 ### CORS
 
-Les origines autorisées sont une expression régulière dans `CORS_ALLOW_ORIGIN` (`.env`, surchargeable dans `.env.local` ou par variable d'environnement). Par défaut : `http://localhost` sur les ports 3000, 3010, 3100, 3110, 3120, 3130, 3150, 3200, 3210, 3220, 3230, 3250, 5173 et 8095. En-têtes autorisés : `Content-Type`, `Accept`, `X-Scenario`.
+Les origines autorisées sont une expression régulière dans `CORS_ALLOW_ORIGIN` (`.env`, surchargeable dans `.env.local` ou par variable d'environnement). Par défaut : `http://localhost` sur les ports 3000, 3010, 3100, 3102, 3110, 3111, 3112, 3120, 3121, 3122, 3130, 3133, 3150, 3151, 3200, 3210, 3220, 3230, 3250, 5173 et 8095 (développement, tests et Lighthouse des fronts). En-têtes autorisés : `Content-Type`, `Accept`, `X-Scenario`.
 
 ### Générer les types TypeScript
 
