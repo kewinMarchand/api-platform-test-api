@@ -164,7 +164,7 @@ Les origines autorisées sont une expression régulière dans `CORS_ALLOW_ORIGIN
 
 Le schéma OpenAPI est servi à **`http://localhost:8090/api/docs.jsonopenapi`** (OpenAPI 3.2, `application/vnd.openapi+json`). Il est aussi versionné dans **`openapi.json`** à la racine, pour générer les types sans lancer l'API. Côté front, `make api-types` génère les types depuis le schéma désigné par `API_SCHEMA_URL` (voir le README du front).
 
-Les schémas utiles côté front sont `Task`, `Article`, `ContactMessage`, `ConstraintViolation`, `Category`, `ProductList`, `ProductItem`, `ProductFacets`, `FacetValue` et `CategoryFacetValue` (les variantes `.jsonld` concernent le JSON-LD). `make qa` échoue si `openapi.json` n'est plus à jour : relancer `make openapi` après toute modification d'une ressource.
+Les schémas utiles côté front sont `Task`, `Article`, `ContactMessage`, `ConstraintViolation`, `Category`, `ProductList`, `ProductItem`, `ProductFacets`, `FacetValue` et `CategoryFacetValue` (les variantes `.jsonld` concernent le JSON-LD). `make qa` échoue si `openapi.json` est périmé : relancer `make openapi` après toute modification d'une ressource.
 
 ### Front dans un conteneur Docker
 

@@ -48,8 +48,8 @@ API de test commune aux boilerplates front. Les conventions générales sont dan
 ## Pièges rencontrés
 
 - **CSP absente des erreurs en debug** : `ErrorListener::removeCspHeader` de Symfony retire la CSP des réponses d'erreur quand `kernel.debug` est vrai (dev et test). En prod, la 404 la porte. Le test ne vérifie donc que les réponses réussies. Et le `Content-Type` d'une page Twig n'est posé qu'à l'envoi : l'abonné le déduit du format de la requête.
-- **Recette Flex de doctrine-bundle** : elle ajoute un service `database` en PostgreSQL 16 dans `compose.yaml` et un `compose.override.yaml` qui publie le port 5432 sur un port aléatoire. Les deux ont été retirés. Surveiller après tout `composer require`.
-- **X-Scenario et la 500 en HTML** : la sous-requête qu'API Platform lance pour rendre l'erreur reprend les en-têtes, repasse dans le provider décoré et relance l'exception. Symfony retombait alors sur sa page HTML. D'où le test `request === mainRequest` dans `ScenarioProvider`.
+- **Recette Flex de doctrine-bundle** : elle ajoute un service `database` en PostgreSQL 16 dans `compose.yaml` et un `compose.override.yaml` qui publie le port 5432 sur un port aléatoire. Le projet n'en garde aucun : surveiller après tout `composer require`.
+- **X-Scenario et la 500 en HTML** : la sous-requête qu'API Platform lance pour rendre l'erreur reprend les en-têtes, repasse dans le provider décoré et relance l'exception. Sans garde, Symfony retombe alors sur sa page HTML : d'où le test `request === mainRequest` dans `ScenarioProvider`.
 - **`#[When]` ne supprime pas la définition** : hors environnement ciblé, la classe reste dans le `ContainerBuilder` avec le tag `container.excluded`, retiré à la compilation. `ScenarioRegistrationTest` vérifie le tag, pas seulement `hasDefinition()`.
 - **`ApiTestCase` et `$alwaysBootKernel`** : sans `protected static ?bool $alwaysBootKernel = false;`, API Platform émet une dépréciation et `failOnDeprecation` fait échouer la suite.
 - **Journaux dans PHPUnit** : sans Monolog, le logger par défaut écrit les 422 et 500 provoquées par les tests sur la sortie d'erreur. En test, `logger` est un `NullLogger` (`config/services.yaml`).
